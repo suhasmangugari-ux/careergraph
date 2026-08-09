@@ -48,12 +48,19 @@ def get_career_overview(student_id: str, job_id: str):
         """, job_id=job_id)
         required_skills = [r.data() for r in res_req]
 
-        current_ids = {s["id"] for s in current_skills}
-        required_ids = {s["id"] for s in required_skills}
+        # Convert IDs to string to ensure exact matching regardless of type
+        current_ids = {str(s["id"]) for s in current_skills}
+        required_ids = {str(s["id"]) for s in required_skills}
         
-        missing_skills = [s for s in required_skills if s["id"] not in current_ids]
+        # Calculate missing skills
+        missing_skills = [s for s in required_skills if str(s["id"]) not in current_ids]
         
-        readiness = round((len(required_ids - (required_ids - current_ids)) / len(required_ids)) * 100) if required_ids else 0
+        # Calculate exact matched skills
+        matched_count = len(required_ids.intersection(current_ids))
+        total_required = len(required_ids)
+        
+        # Dynamic readiness score percentage
+        readiness = round((matched_count / total_required) * 100) if total_required > 0 else 0
 
         return {
             "readiness": readiness,
