@@ -19,13 +19,12 @@ It can be hard to keep track of the many technology career paths. Having an idea
 * **Curated Learning Pathways**: Get course and practical recommendations that are customized to your needs to learn the necessary skills in the fastest possible time.
 ---
 
-## Live Demo
+## 🚀 Live Demo
 
 You can try the live application here:
 
-* **Frontend Dashboard**: [https://careergraphfrontend-production.up.railway.app](https://www.google.com/search?q=https://careergraphfrontend-production.up.railway.app)
+* **Frontend Dashboard**: [https://careergraphfrontend-production.up.railway.app](https://careergraphfrontend-production.up.railway.app)
 * **API Documentation**: [https://careergraph-production.up.railway.app/docs](https://careergraph-production.up.railway.app/docs)
-
 ---
 
 ## How It Works (High-Level)
