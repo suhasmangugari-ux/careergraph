@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+neo4j
+python-dotenv
+requests
+pyvis
+streamlit
