@@ -34,33 +34,44 @@ def get_jobs():
 @app.get("/api/career-overview")
 def get_career_overview(student_id: str, job_id: str):
     with db.driver.session() as session:
-        # Current Skills
+        # 1. Student's Current Skills
         res_current = session.run("""
             MATCH (s:Student {id: $student_id})-[:HAS_SKILL]->(sk:Skill)
             RETURN sk.id AS id, sk.name AS name
         """, student_id=student_id)
         current_skills = [r.data() for r in res_current]
 
-        # Job Required Skills
+        # 2. Job Direct Requirements
         res_req = session.run("""
             MATCH (j:Job {id: $job_id})-[r:REQUIRES]->(sk:Skill)
             RETURN sk.id AS id, sk.name AS name, r.importance AS importance
         """, job_id=job_id)
         required_skills = [r.data() for r in res_req]
 
-        # Convert IDs to string to ensure exact matching regardless of type
+        # 3. Path Prerequisites (All skills involved in reaching job goals)
+        res_all_path_skills = session.run("""
+            MATCH (j:Job {id: $job_id})-[:REQUIRES]->(target:Skill)
+            MATCH p = (start:Skill)-[:PREREQUISITE_FOR*0..5]->(target)
+            UNWIND nodes(p) AS n
+            RETURN DISTINCT n.id AS id, n.name AS name
+        """, job_id=job_id)
+        all_path_skills = [r.data() for r in res_all_path_skills]
+
         current_ids = {str(s["id"]) for s in current_skills}
         required_ids = {str(s["id"]) for s in required_skills}
-        
-        # Calculate missing skills
+        all_path_ids = {str(s["id"]) for s in all_path_skills}
+
+        # Missing direct job skills
         missing_skills = [s for s in required_skills if str(s["id"]) not in current_ids]
+
+        # Total skills involved in path (or direct requirements)
+        total_relevant = len(all_path_ids) if all_path_ids else len(required_ids)
         
-        # Calculate exact matched skills
-        matched_count = len(required_ids.intersection(current_ids))
-        total_required = len(required_ids)
-        
-        # Dynamic readiness score percentage
-        readiness = round((matched_count / total_required) * 100) if total_required > 0 else 0
+        # Student skills that match the path/requirements
+        matched_count = len(current_ids.intersection(all_path_ids if all_path_ids else required_ids))
+
+        # Readiness percentage (e.g. 3 matching out of 8 total nodes = ~38%)
+        readiness = round((matched_count / total_relevant) * 100) if total_relevant > 0 else 0
 
         return {
             "readiness": readiness,
