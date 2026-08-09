@@ -3,8 +3,9 @@ import requests
 from pyvis.network import Network
 import streamlit.components.v1 as components
 
-API_URL = "http://127.0.0.1:8000/api"
-
+# API_URL = "http://127.0.0.1:8000/api"
+BASE_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+API_URL = f"{BASE_URL}/api"
 st.set_page_config(page_title="CareerGraph", layout="wide")
 
 st.title("CareerGraph: AI Skill Path Explorer")
